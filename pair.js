@@ -1,95 +1,94 @@
-const PastebinAPI = require('pastebin-js'),
-pastebin = new PastebinAPI('EMWTMkQAVfJa9kM-MRUrxd5Oku1U7pgL')
-const {makeid} = require('./id');
 const express = require('express');
 const fs = require('fs');
-let router = express.Router()
 const pino = require("pino");
 const {
-    default: Gifted_Tech,
-    useMultiFileAuthState,
-    delay,
-    makeCacheableSignalKeyStore,
-    Browsers
+  default: Gifted_Tech,
+  useMultiFileAuthState,
+  delay,
+  makeCacheableSignalKeyStore,
 } = require("maher-zubair-baileys");
 
-function removeFile(FilePath){
-    if(!fs.existsSync(FilePath)) return false;
-    fs.rmSync(FilePath, { recursive: true, force: true })
- };
+const router = express.Router();
+
+function removeFile(filePath) {
+  if (!fs.existsSync(filePath)) return false;
+  fs.rmSync(filePath, { recursive: true, force: true });
+};
+
+function generateAimsCode() {
+  const timestamp = new Date().toISOString().replace(/[-T:.Z]/g, "").slice(0, 14);
+  const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+  return `AIMS-CODE-${timestamp}-${random}`;
+}
+
 router.get('/', async (req, res) => {
-    const id = makeid();
-    let num = req.query.number;
-        async function GIFTED_MD_PAIR_CODE() {
-        const {
-            state,
-            saveCreds
-        } = await useMultiFileAuthState('./temp/'+id)
-     try {
-            let Pair_Code_By_Gifted_Tech = Gifted_Tech({
-                auth: {
-                    creds: state.creds,
-                    keys: makeCacheableSignalKeyStore(state.keys, pino({level: "fatal"}).child({level: "fatal"})),
-                },
-                printQRInTerminal: false,
-                logger: pino({level: "fatal"}).child({level: "fatal"}),
-                browser: ["Chrome (Linux)", "", ""]
-             });
-             if(!Pair_Code_By_Gifted_Tech.authState.creds.registered) {
-                await delay(1500);
-                        num = num.replace(/[^0-9]/g,'');
-                            const code = await Pair_Code_By_Gifted_Tech.requestPairingCode(num)
-                 if(!res.headersSent){
-                 await res.send({code});
-                     }
-                 }
-            Pair_Code_By_Gifted_Tech.ev.on('creds.update', saveCreds)
-            Pair_Code_By_Gifted_Tech.ev.on("connection.update", async (s) => {
-                const {
-                    connection,
-                    lastDisconnect
-                } = s;
-                if (connection == "open") {
-                await delay(5000);
-                let data = fs.readFileSync(__dirname + `/temp/${id}/creds.json`);
-                await delay(800);
-               let b64data = Buffer.from(data).toString('base64');
-               let session = await Pair_Code_By_Gifted_Tech.sendMessage(Pair_Code_By_Gifted_Tech.user.id, { text: '' + b64data });
+  const id = generateAimsCode();
+  let num = req.query.number;
 
-               let GIFTED_MD_TEXT = `
-┏━━━━━━━━━━━━━━
-┃SIGMA-MD SESSION IS 
-┃CONNECTED SUCCESSFULLY 
-┗━━━━━━━━━━━━━━━
-▬▬▬▬▬▬▬▬▬▬▬▬▬▬
-❶ || Creator = CONWAY
-▬▬▬▬▬▬▬▬▬▬▬▬▬▬
-❷ || WhattsApp Channel = https://whatsapp.com/channel/0029VbAVuiVBPzjdU7EVNw0t
-▬▬▬▬▬▬▬▬▬▬▬▬▬
-▬▬▬▬▬▬▬▬▬▬▬▬▬
-©*2024-2099 Conway 
+  if (!num || num.length < 10) {
+    return res.status(400).json({ error: "Invalid WhatsApp number." });
+  }
 
-_Don't Forget To Give Star To My Repo_`
- await Pair_Code_By_Gifted_Tech.sendMessage(Pair_Code_By_Gifted_Tech.user.id,{text:GIFTED_MD_TEXT},{quoted:session})
- 
+  async function AIMS_CODE_GENERATOR() {
+    const { state, saveCreds } = await useMultiFileAuthState(`./temp/${id}`);
+    try {
+      let client = Gifted_Tech({
+        auth: {
+          creds: state.creds,
+          keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" }).child({ level: "fatal" })),
+        },
+        printQRInTerminal: false,
+        logger: pino({ level: "fatal" }).child({ level: "fatal" }),
+        browser: ["Chrome (Linux)", "", ""]
+      });
 
-        await delay(100);
-        await Pair_Code_By_Gifted_Tech.ws.close();
-        return await removeFile('./temp/'+id);
-            } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
-                    await delay(10000);
-                    GIFTED_MD_PAIR_CODE();
-                }
-            });
-        } catch (err) {
-            console.log("service restated");
-            await removeFile('./temp/'+id);
-         if(!res.headersSent){
-            await res.send({code:"Service Unavailable"});
-         }
+      if (!client.authState.creds.registered) {
+        await delay(1500);
+        num = num.replace(/[^0-9]/g, '');
+        const code = await client.requestPairingCode(num);
+        if (!res.headersSent) {
+          res.send({ code, session_id: id });
         }
-    }
-    return await GIFTED_MD_PAIR_CODE()
-});
-module.exports = router;
+      }
 
+      client.ev.on('creds.update', saveCreds);
+      client.ev.on("connection.update", async (s) => {
+        const { connection, lastDisconnect } = s;
+        if (connection === "open") {
+          await delay(5000);
+          let data = fs.readFileSync(__dirname + `/temp/${id}/creds.json`);
+          await delay(800);
+          let b64data = Buffer.from(data).toString('base64');
+          let session = await client.sendMessage(client.user.id, { text: '' + b64data });
+
+          let msg = `
+┏━━━━━━━━━━━━━━
+┃SESSION LINKED: AIMS-CODE
+┃ID: ${id}
+┗━━━━━━━━━━━━━━━
+Conway Tech || 2025
+          `;
+
+          await client.sendMessage(client.user.id, { text: msg }, { quoted: session });
+          await delay(100);
+          await client.ws.close();
+          return removeFile(`./temp/${id}`);
+
+        } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
+          await delay(10000);
+          AIMS_CODE_GENERATOR();
+        }
+      });
+    } catch (err) {
+      console.log("Error occurred. Restarting session...");
+      removeFile(`./temp/${id}`);
+      if (!res.headersSent) {
+        res.send({ code: "Service Unavailable" });
+      }
+    }
+  }
+
+  return AIMS_CODE_GENERATOR();
+});
+
+module.exports = router;
