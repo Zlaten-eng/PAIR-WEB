@@ -83,25 +83,39 @@
   <button onclick="window.open(`https://github.com/YAMAL-YENG/SIGMA-MD`)" class="btn">Bot Repo</button>
   <button onclick="window.open(`https://whatsapp.com/channel/0029VbAVuiVBPzjdU7EVNw0t`)" class="btn">Wa Channel</button>
   <button onclick="window.open(`https://chat.whatsapp.com/E9mVfukNRX13eF45Wbmk7t`)" class="btn">Whatsapp Group</button>
-  <button id="copy-btn">📋 Copy Code</button>
-    <button id="play-btn">▶️ Play Song</button>
-  </div>
+  <!-- AUDIO SECTION -->
+<audio id="background-audio">
+  <source src="https://files.catbox.moe/w2j17k.m4a" type="audio/mpeg">
+  Your browser does not support the audio element.
+</audio>
 
-  <audio id="background-audio">
-    <source src="https://files.catbox.moe/w2j17k.m4a">
-  </audio>
+<!-- CONTROL BUTTONS -->
+<button id="play-btn">▶️ Play Audio</button>
+<button id="pause-btn">⏸️ Pause Audio</button>
 
-  <script>
-    const msg = document.getElementById("waiting-message");
-    const submitBtn = document.getElementById("submit");
-    const numberInput = document.getElementById("number");
-    const copyBtn = document.getElementById("copy-btn");
-    const audio = document.getElementById("background-audio");
-    const playBtn = document.getElementById("play-btn");
+<script>
+  const audio = document.getElementById("background-audio");
+  const playBtn = document.getElementById("play-btn");
+  const pauseBtn = document.getElementById("pause-btn");
 
-    submitBtn.addEventListener("click", async (e) => {
-      e.preventDefault();
-      const value = numberInput.value.replace(/[^0-9]/g, "");
+  playBtn.addEventListener("click", () => {
+    audio.play();
+  });
+
+  pauseBtn.addEventListener("click", () => {
+    audio.pause();
+  });
+</script>
+<style>
+  #play-btn, #pause-btn {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+</style>
+</body>
+</html> 
 
 </body>
 </html>
