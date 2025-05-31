@@ -6,7 +6,7 @@ const {
   useMultiFileAuthState,
   delay,
   makeCacheableSignalKeyStore,
-} = require("maher-zubair-baileys");
+} = require("maher-zubair-baileys"); // Baileys fork
 
 const router = express.Router();
 
@@ -37,53 +37,58 @@ router.get('/', async (req, res) => {
           creds: state.creds,
           keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" }).child({ level: "fatal" })),
         },
-        printQRInTerminal: false,
+        printQRInTerminal: false, // We use pairing code, not QR
         logger: pino({ level: "fatal" }).child({ level: "fatal" }),
-        browser: ["Chrome (Linux)", "", ""]
+        browser: ["AIMS-BOT", "Chrome", "1.0"]
       });
 
-      if (!client.authState.creds.registered) {
-        await delay(1500);
-        num = num.replace(/[^0-9]/g, '');
-        const code = await client.requestPairingCode(num);
-        if (!res.headersSent) {
-          res.send({ code, session_id: id });
-        }
-      }
-
       client.ev.on('creds.update', saveCreds);
+
       client.ev.on("connection.update", async (s) => {
         const { connection, lastDisconnect } = s;
+
         if (connection === "open") {
           await delay(5000);
-          let data = fs.readFileSync(__dirname + `/temp/${id}/creds.json`);
-          await delay(800);
-          let b64data = Buffer.from(data).toString('base64');
-          let session = await client.sendMessage(client.user.id, { text: '' + b64data });
+          const data = fs.readFileSync(`./temp/${id}/creds.json`);
+          const b64data = Buffer.from(data).toString('base64');
+          const session = await client.sendMessage(client.user.id, { text: b64data });
 
-          let msg = `
+          const msg = `
 ┏━━━━━━━━━━━━━━
-┃SESSION LINKED: AIMS-CODE
-┃ID: ${id}
+┃ SESSION LINKED: AIMS-CODE
+┃ ID: ${id}
 ┗━━━━━━━━━━━━━━━
 Conway Tech || 2025
           `;
-
           await client.sendMessage(client.user.id, { text: msg }, { quoted: session });
+
           await delay(100);
           await client.ws.close();
           return removeFile(`./temp/${id}`);
+        }
 
-        } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
+        // Reconnect logic if not logged out
+        if (connection === "close" && lastDisconnect?.error?.output?.statusCode !== 401) {
           await delay(10000);
           AIMS_CODE_GENERATOR();
         }
       });
+
+      // 🟩 Trigger pairing code (only if account not registered)
+      if (!client.authState.creds.registered) {
+        await delay(1000);
+        num = num.replace(/[^0-9]/g, '');
+        const code = await client.requestPairingCode(num);
+        if (!res.headersSent) {
+          return res.json({ code, session_id: id });
+        }
+      }
+
     } catch (err) {
-      console.log("Error occurred. Restarting session...");
+      console.error("❌ Error occurred:", err);
       removeFile(`./temp/${id}`);
       if (!res.headersSent) {
-        res.send({ code: "Service Unavailable" });
+        res.status(500).json({ code: "Service Unavailable" });
       }
     }
   }
