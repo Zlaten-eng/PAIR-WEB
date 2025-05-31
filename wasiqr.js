@@ -97,4 +97,5 @@ _Don't Forget To Give Star To My Repo_`
 	}
 	return await WASI_MD_QR_CODE()
 });
-module.exports = route
+module.exports = router;
+
