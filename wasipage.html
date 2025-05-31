@@ -7,14 +7,68 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
   <style>
-    body {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
+    * {
+      box-sizing: border-box;
+    }
+
+    body, html {
       margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Orbitron', sans-serif;
+      color: white;
       background-color: black;
+      overflow: hidden;
+    }
+
+    .video-header {
+      position: relative;
+      height: 100vh;
+      width: 100%;
+    }
+
+    .video-header video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+    }
+
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.6);
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      top: 10%;
+      padding-top: 40px;
+    }
+
+    .content h1 {
+      font-size: 60px;
+      margin-bottom: 40px;
+      letter-spacing: 2px;
+      font-family: 'Playfair Display', serif;
+    }
+
+    .footer {
+      position: absolute;
+      bottom: 10px;
+      width: 100%;
+      text-align: center;
+      font-weight: bold;
+      font-size: 16px;
+      color: #00ffcc;
     }
 
     .btn {
@@ -32,10 +86,10 @@
       z-index: 1;
       font-weight: 300;
       font-size: 17px;
-      font-family: 'Roboto', 'Segoe UI', sans-serif;
+      font-family: 'Orbitron', sans-serif;
       text-transform: uppercase;
       color: var(--color);
-      margin-bottom: 24px;
+      margin: 10px;
     }
 
     .btn::after, .btn::before {
@@ -74,48 +128,67 @@
       filter: brightness(.7);
       transform: scale(.98);
     }
+
+    #play-btn, #pause-btn {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 5px;
+      background-color: #222;
+      color: white;
+      border: 1px solid white;
+      border-radius: 6px;
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    .button-container {
+      margin-top: 30px;
+    }
   </style>
 </head>
 <body>
 
-  <button onclick="window.open(`/wasiqr`)" class="btn">QR Code</button>
-  <button onclick="window.open(`/pair`)" class="btn">Pair Code</button>
-  <button onclick="window.open(`https://github.com/YAMAL-YENG/SIGMA-MD`)" class="btn">Bot Repo</button>
-  <button onclick="window.open(`https://whatsapp.com/channel/0029VbAVuiVBPzjdU7EVNw0t`)" class="btn">Wa Channel</button>
-  <button onclick="window.open(`https://chat.whatsapp.com/E9mVfukNRX13eF45Wbmk7t`)" class="btn">Whatsapp Group</button>
-  <!-- AUDIO SECTION -->
+<div class="video-header">
+  <video autoplay muted loop>
+    <source src="https://files.catbox.moe/cy8xqg.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  <div class="overlay"></div>
+  <div class="content">
+    <h1>SIGMA-MD</h1>
+
+    <!-- BUTTONS -->
+    <div class="button-container">
+      <button onclick="window.open(`/wasiqr`)" class="btn">QR Code</button>
+      <button onclick="window.open(`/pair`)" class="btn">Pair Code</button>
+      <button onclick="window.open(`https://github.com/YAMAL-YENG/SIGMA-MD`)" class="btn">Bot Repo</button>
+      <button onclick="window.open(`https://whatsapp.com/channel/0029VbAVuiVBPzjdU7EVNw0t`)" class="btn">Wa Channel</button>
+      <button onclick="window.open(`https://chat.whatsapp.com/E9mVfukNRX13eF45Wbmk7t`)" class="btn">Whatsapp Group</button>
+    </div>
+
+    <!-- AUDIO CONTROLS -->
+    <div class="button-container">
+      <button id="play-btn">▶️ Play Audio</button>
+      <button id="pause-btn">⏸️ Pause Audio</button>
+    </div>
+  </div>
+
+  <div class="footer">POWERED BY CONWAY</div>
+</div>
+
 <audio id="background-audio">
   <source src="https://files.catbox.moe/w2j17k.m4a" type="audio/mpeg">
   Your browser does not support the audio element.
 </audio>
-
-<!-- CONTROL BUTTONS -->
-<button id="play-btn">▶️ Play Audio</button>
-<button id="pause-btn">⏸️ Pause Audio</button>
 
 <script>
   const audio = document.getElementById("background-audio");
   const playBtn = document.getElementById("play-btn");
   const pauseBtn = document.getElementById("pause-btn");
 
-  playBtn.addEventListener("click", () => {
-    audio.play();
-  });
-
-  pauseBtn.addEventListener("click", () => {
-    audio.pause();
-  });
+  playBtn.addEventListener("click", () => audio.play());
+  pauseBtn.addEventListener("click", () => audio.pause());
 </script>
-<style>
-  #play-btn, #pause-btn {
-    margin: 10px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-  }
-</style>
-</body>
-</html> 
 
 </body>
 </html>
